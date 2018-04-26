@@ -2,9 +2,16 @@
 #include <mpi.h>
 #include <stdlib.h>
 #include <time.h>
-#include <math.h>
 
 #define POINTS 300000000
+
+double power(double val, int p)
+{
+    if(p == 1)
+        return val;
+    else
+        return val * power(val, p - 1);
+}
 
 int main()
 {
@@ -30,7 +37,7 @@ int main()
             sum = 0;
 
             for(int c = 0; c < d; c++)
-                sum += pow((double)rand_r(&seed) / RAND_MAX, 2);
+                sum += power((double)rand_r(&seed) / RAND_MAX, 2);
             
             if(sum < 1)
                 counter_local++;
@@ -39,7 +46,7 @@ int main()
         MPI_Reduce(&counter_local, &counter, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
 
         if(id == 0)
-            printf("Volume of %d-dimensional ball is: %f\n", d, pow(2, d) * ((double)counter / POINTS));
+            printf("Volume of %d-dimensional ball is: %f\n", d, power(2, d) * ((double)counter / POINTS));
     }
 
     MPI_Finalize();
